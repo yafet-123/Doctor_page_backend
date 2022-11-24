@@ -1,0 +1,921 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AccountGroup {
+  id                 Int        @id(map: "account_group_id_primary") @default(autoincrement())
+  AccountType        String     @db.VarChar(100)
+  AccountDescription String     @db.VarChar
+  CreatedDate        DateTime?  @default(now()) @db.Timestamptz(6)
+  CreatedBy          Int?
+  IsActive           Boolean?
+  ModifiedDate       DateTime?  @default(now()) @db.Timestamptz(6)
+  Accounts           Accounts[]
+}
+
+model AccountInformation {
+  id                Int              @id(map: "accountinformation_id_primary") @default(autoincrement())
+  TitleId           Int?
+  IdNumber          String?          @db.VarChar(255)
+  IdTypeId          Int?
+  Email             String?          @db.VarChar(255)
+  PhoneNumberTypeId Int?
+  PhoneNumber       Int?
+  RegionId          Int?
+  CountryId         Int?
+  SubCityId         Int?
+  ZoneId            Int?
+  WoredaId          Int
+  Kebele            String?          @db.VarChar(255)
+  HouseNumber       String?          @db.VarChar(255)
+  CreatedDate       DateTime?        @default(now()) @db.Timestamptz(6)
+  CreatedBy         Int?
+  ModifiedDate      DateTime?        @default(now()) @db.Timestamptz(6)
+  GenderId          Int?
+  Gender            Gender?          @relation(fields: [GenderId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "accountinformation_gender_id_fk")
+  IdType            IdType?          @relation(fields: [IdTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "accountinformation_id_type_foreign")
+  PhoneNumberType   PhoneNumberType? @relation(fields: [PhoneNumberTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "accountinformation_phone_number_foreign")
+  Title             Title?           @relation(fields: [TitleId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "accountinformation_title_id_foreign")
+  Accounts          Accounts[]
+}
+
+model AccountStatus {
+  id                    Int        @id(map: "account_status_id_primary") @default(autoincrement())
+  AccountCreatedDate    DateTime?  @default(now()) @db.Timestamptz(6)
+  AccountExpirationDate DateTime?  @db.Date
+  CreatedDate           DateTime?  @default(now()) @db.Timestamptz(6)
+  CreatedBy             Int?
+  IsActive              Boolean?
+  ModifiedDate          DateTime?  @default(now()) @db.Timestamptz(6)
+  Accounts              Accounts[]
+}
+
+model Accounts {
+  id                      Int                       @id(map: "accounts_id_primary") @default(autoincrement())
+  FirstName               String?                   @db.VarChar(255)
+  MiddleName              String?                   @db.VarChar(255)
+  LastName                String?                   @db.VarChar(255)
+  AccountGroupId          Int?
+  AccountStatusId         Int?
+  UserName                String?                   @unique(map: "accounts_username_uindex") @db.VarChar(255)
+  Password                String?                   @db.VarChar(255)
+  CreatedDate             DateTime?                 @default(now()) @db.Timestamptz(6)
+  CreatedBy               Int?
+  ModifiedDate            DateTime?                 @default(now()) @db.Timestamptz(6)
+  AccountInformationId    Int?
+  AccountInformation      AccountInformation?       @relation(fields: [AccountInformationId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "AccountInformation_accountstatus_id_foreign")
+  AccountGroup            AccountGroup?             @relation(fields: [AccountGroupId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "accounts_accountgruop_id_foreign")
+  Accounts                Accounts?                 @relation("AccountsToAccounts", fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "accounts_accounts_id_fk")
+  AccountStatus           AccountStatus?            @relation(fields: [AccountStatusId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "accounts_accountstatus_id_foreign")
+  other_Accounts          Accounts[]                @relation("AccountsToAccounts")
+  Appointments            Appointments[]
+  Country                 Country[]
+  DeathCertification      DeathCertification[]
+  DiagnosisList           DiagnosisList[]
+  Doc_Dashboard           Doc_Dashboard[]
+  Gender                  Gender[]
+  IntraReferral           IntraReferral[]
+  Invoice                 Invoice[]
+  InvoiceItem             InvoiceItem[]
+  InvoiceItemStatus       InvoiceItemStatus[]
+  IsExpire                IsExpire[]
+  ItemStatus              ItemStatus[]
+  LabDepartment           LabDepartment[]
+  LabPanelTest            LabPanelTest[]
+  LabPanels               LabPanels[]
+  LabTestResult           LabTestResult[]
+  LabTests                LabTests[]
+  LabTransferStatus       LabTransferStatus[]
+  Manufacturer            Manufacturer[]
+  MaritalStatus           MaritalStatus[]
+  Occupations             Occupations[]
+  OrderedImagRequest      OrderedImagRequest[]
+  OrderedImageRequestInfo OrderedImageRequestInfo[]
+  OrderedLabPanel         OrderedLabPanel[]
+  OrderedLabPanelInfo     OrderedLabPanelInfo[]
+  PatientEmergencyContact PatientEmergencyContact[]
+  PatientHistory          PatientHistory[]
+  PatientList             PatientList[]
+  PatientManagement       PatientManagement[]
+  PatientPrescription     PatientPrescription[]
+  PatientProgress         PatientProgress[]
+  PatientStatus           PatientStatus[]
+  PaymentStatus           PaymentStatus[]
+  PhysicalExamination     PhysicalExamination[]
+  Product                 Product[]
+  RadDepartment           RadDepartment[]
+  RadRequest              RadRequest[]
+  RadRequestResult        RadRequestResult[]
+  Region                  Region[]
+  SickLeave               SickLeave[]
+  Stock                   Stock[]
+  SubCity                 SubCity[]
+  Title                   Title[]
+  UnitOfMeasurements      UnitOfMeasurements[]
+  VitalSigns              VitalSigns[]
+  Woreda                  Woreda[]
+  Zone                    Zone[]
+}
+
+model Appointments {
+  id           Int       @id @default(autoincrement())
+  Appointment  DateTime  @db.Date
+  CreatedDate  DateTime? @default(now()) @db.Timestamptz(6)
+  CreatedBy    Int?
+  IsActive     Boolean?
+  ModifiedDate DateTime? @default(now()) @db.Timestamptz(6)
+  Accounts     Accounts? @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Appointments_accounts_id_foreign")
+}
+
+model ClinicList {
+  id                                                    Int                   @id @default(autoincrement())
+  ClinicName                                            String                @db.VarChar
+  Description                                           String                @db.VarChar
+  CreatedDate                                           DateTime?             @default(now()) @db.Timestamptz(6)
+  CreatedBy                                             Int?
+  IsActive                                              Boolean?
+  ModifiedDate                                          DateTime?             @default(now()) @db.Timestamptz(6)
+  Doc_Dashboard                                         Doc_Dashboard[]
+  IntraReferral_ClinicListToIntraReferral_Clinic        IntraReferral[]       @relation("ClinicListToIntraReferral_Clinic")
+  IntraReferral_ClinicListToIntraReferral_ClinicReferTo IntraReferral[]       @relation("ClinicListToIntraReferral_ClinicReferTo")
+  OrderedImagRequest                                    OrderedImagRequest[]
+  OrderedLabPanel                                       OrderedLabPanel[]
+  OrderedLabPanelInfo                                   OrderedLabPanelInfo[]
+  PatientPrescription                                   PatientPrescription[]
+  RadRequestResult                                      RadRequestResult[]
+  SickLeave                                             SickLeave[]
+}
+
+model Country {
+  id           Int           @id(map: "country_id_primary") @default(autoincrement())
+  CCA2         String        @db.VarChar(255)
+  Name         String        @db.VarChar(255)
+  CCA3         String        @db.VarChar(255)
+  Nationality  String        @db.VarChar(255)
+  CreatedDate  DateTime?     @default(now()) @db.Timestamptz(6)
+  CreatedBy    Int?
+  IsActive     Boolean?
+  ModifiedDate DateTime?     @default(now()) @db.Timestamptz(6)
+  Accounts     Accounts?     @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Country_accounts_id_foreign")
+  PatientList  PatientList[]
+  Region       Region[]
+}
+
+model DeathCertification {
+  id                  Int       @id @default(autoincrement())
+  PatientId           Int
+  DeathDatetime       DateTime  @db.Date
+  DeathLocation       String    @db.VarChar(255)
+  BriefMedicalHistory String    @db.VarChar(255)
+  CreatedDate         DateTime? @default(now()) @db.Timestamptz(6)
+  CreatedBy           Int?
+  IsActive            Boolean?
+  ModifiedDate        DateTime? @default(now()) @db.Timestamptz(6)
+  Accounts            Accounts? @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "DeathCertification_accounts_id_foreign")
+}
+
+model DiagnosisList {
+  id            Int             @id @default(autoincrement())
+  Diagnosis     String          @db.VarChar(255)
+  Code          String          @db.VarChar(255)
+  CreatedDate   DateTime?       @default(now()) @db.Timestamptz(6)
+  CreatedBy     Int?
+  IsActive      Boolean?
+  ModifiedDate  DateTime?       @default(now()) @db.Timestamptz(6)
+  Accounts      Accounts?       @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "DiagnosisList_accounts_id_foreign")
+  Doc_Dashboard Doc_Dashboard[]
+}
+
+model Doc_Dashboard {
+  id                     Int                  @id @default(autoincrement())
+  PatientId              Int
+  HistoryId              Int?
+  VitalSignsId           Int?
+  PhysicalExaminationsId Int?
+  DiagnosisId            Int?
+  ProgressId             Int?
+  ManagementId           Int?
+  CreatedDate            DateTime?            @default(now()) @db.Timestamptz(6)
+  CreatedBy              Int?
+  IsActive               Boolean?
+  ModifiedDate           DateTime?            @default(now()) @db.Timestamptz(6)
+  clinic                 Int?
+  Accounts               Accounts?            @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Doc_Dashboard_accounts_id_foreign")
+  ClinicList             ClinicList?          @relation(fields: [clinic], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "doc_dashboard_cliniclist_id_fk")
+  DiagnosisList          DiagnosisList?       @relation(fields: [DiagnosisId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "doc_dashboard_diagnosislist_id_fk")
+  PatientHistory         PatientHistory?      @relation(fields: [HistoryId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "doc_dashboard_history_foreign")
+  PatientManagement      PatientManagement?   @relation(fields: [ManagementId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "doc_dashboard_management_foreign")
+  PatientList            PatientList          @relation(fields: [PatientId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "doc_dashboard_patient_foreign")
+  PhysicalExamination    PhysicalExamination? @relation(fields: [PhysicalExaminationsId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "doc_dashboard_physical_examinations_foreign")
+  PatientProgress        PatientProgress?     @relation(fields: [ProgressId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "doc_dashboard_progress_foreign")
+  VitalSigns             VitalSigns?          @relation(fields: [VitalSignsId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "doc_dashboard_vital_signs_foreign")
+}
+
+model Gender {
+  id                      Int                       @id(map: "gender_id_primary") @default(autoincrement())
+  Type                    String                    @db.VarChar(255)
+  Description             String                    @db.VarChar(255)
+  CreatedDate             DateTime?                 @default(now()) @db.Timestamptz(6)
+  CreatedBy               Int?
+  IsActive                Boolean?
+  ModifiedDate            DateTime?                 @default(now()) @db.Timestamptz(6)
+  Accounts                Accounts?                 @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Gender_accounts_id_foreign")
+  AccountInformation      AccountInformation[]
+  PatientEmergencyContact PatientEmergencyContact[]
+  PatientList             PatientList[]
+}
+
+model IdType {
+  id                 Int                  @id(map: "idtype_id_primary") @default(autoincrement())
+  IdType             String               @db.VarChar(255)
+  IdDescription      String               @db.VarChar(255)
+  CreatedDate        DateTime?            @default(now()) @db.Timestamptz(6)
+  CreatedBy          Int?
+  IsActive           Boolean?
+  ModifiedDate       DateTime?            @default(now()) @db.Timestamptz(6)
+  AccountInformation AccountInformation[]
+}
+
+model IntraReferral {
+  id                                                 Int        @id @default(autoincrement())
+  PatientId                                          Int
+  Clinic                                             Int
+  ClinicReferTo                                      Int
+  Note                                               String     @db.VarChar
+  CreatedDate                                        DateTime?  @default(now()) @db.Timestamptz(6)
+  CreatedBy                                          Int?
+  IsActive                                           Boolean?
+  ModifiedDate                                       DateTime?  @default(now()) @db.Timestamptz(6)
+  ClinicList_ClinicListToIntraReferral_Clinic        ClinicList @relation("ClinicListToIntraReferral_Clinic", fields: [Clinic], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "IntraReferral_ClinicId_id_foreign")
+  ClinicList_ClinicListToIntraReferral_ClinicReferTo ClinicList @relation("ClinicListToIntraReferral_ClinicReferTo", fields: [ClinicReferTo], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "IntraReferral_ClinicReferTo_id_foreign")
+  Accounts                                           Accounts?  @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "IntraReferral_accounts_id_foreign")
+}
+
+model Invoice {
+  id           Int           @id @default(autoincrement())
+  PatientId    Int
+  CreatedDate  DateTime?     @default(now()) @db.Timestamptz(6)
+  CreatedBy    Int?
+  IsActive     Boolean?
+  ModifiedDate DateTime?     @default(now()) @db.Timestamptz(6)
+  Accounts     Accounts?     @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Invoice_accounts_id_foreign")
+  PatientList  PatientList   @relation(fields: [PatientId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_patient_foreign")
+  InvoiceItem  InvoiceItem[]
+}
+
+model InvoiceItem {
+  id                    Int                  @id @default(autoincrement())
+  InvoiceId             Int
+  StockId               Int
+  OrderedQuantity       Float
+  OrderedBy             Int?
+  CreatedDate           DateTime?            @default(now()) @db.Timestamptz(6)
+  CreatedBy             Int?
+  IsActive              Boolean?
+  ModifiedDate          DateTime?            @default(now()) @db.Timestamptz(6)
+  PatientPrescriptionId Int?
+  Accounts              Accounts?            @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "InvoiceItem_accounts_id_foreign")
+  Invoice               Invoice              @relation(fields: [InvoiceId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoice_id_foreign")
+  PatientPrescription   PatientPrescription? @relation(fields: [PatientPrescriptionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoiceitem_patientprescription_id_fk")
+  Stock                 Stock                @relation(fields: [StockId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoiceitem_stockid_foreign")
+  InvoiceItemStatus     InvoiceItemStatus[]
+}
+
+model InvoiceItemStatus {
+  id            Int          @id @default(autoincrement())
+  InvoiceItemId Int?
+  InvoiceNumber String       @db.VarChar(255)
+  CreatedDate   DateTime?    @default(now()) @db.Timestamptz(6)
+  CreatedBy     Int?
+  IsActive      Boolean?
+  ModifiedDate  DateTime?    @default(now()) @db.Timestamptz(6)
+  paidAmount    Float?
+  Accounts      Accounts?    @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "InvoiceItemStatus_accounts_id_foreign")
+  InvoiceItem   InvoiceItem? @relation(fields: [InvoiceItemId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invoiceitemstatus_invoiceitem_id_fk")
+}
+
+model IsExpire {
+  id           Int       @id @default(autoincrement())
+  IsExpire     Boolean
+  Remark       String    @db.VarChar(255)
+  CreatedDate  DateTime? @default(now()) @db.Timestamptz(6)
+  CreatedBy    Int?
+  IsActive     Boolean?
+  ModifiedDate DateTime? @default(now()) @db.Timestamptz(6)
+  Accounts     Accounts? @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "IsExpire_accounts_id_foreign")
+  Stock        Stock[]
+}
+
+model ItemStatus {
+  id           Int         @id(map: "Status_pkey") @default(autoincrement())
+  status       Boolean
+  remark       String      @db.VarChar(255)
+  createdDate  DateTime?   @default(now()) @db.Timestamptz(6)
+  createdBy    Int?
+  isActive     Boolean?
+  modifiedDate DateTime?   @default(now()) @db.Timestamptz(6)
+  Accounts     Accounts?   @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Status_accounts_id_foreign")
+  LabPanels    LabPanels[]
+}
+
+model LabDepartment {
+  id           Int         @id @default(autoincrement())
+  name         String      @db.VarChar(255)
+  abbreviation String      @db.VarChar(255)
+  remark       String      @db.VarChar
+  createdDate  DateTime?   @default(now()) @db.Timestamptz(6)
+  createdBy    Int?
+  isActive     Boolean?
+  modifiedDate DateTime?   @default(now()) @db.Timestamptz(6)
+  Accounts     Accounts?   @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "LabDepartment_accounts_id_foreign")
+  LabPanels    LabPanels[]
+}
+
+model LabPanelTest {
+  id           Int       @id @default(autoincrement())
+  panelId      Int
+  testId       Int
+  createdDate  DateTime? @default(now()) @db.Timestamptz(6)
+  createdBy    Int?
+  isActive     Boolean?
+  modifiedDate DateTime? @default(now()) @db.Timestamptz(6)
+  Accounts     Accounts? @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "LabPanelTest_accounts_id_foreign")
+  LabPanels    LabPanels @relation(fields: [panelId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "panel_test_panel_id_foreign")
+  LabTests     LabTests  @relation(fields: [testId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "panel_test_test_id_foreign")
+}
+
+model LabPanels {
+  id                 Int               @id @default(autoincrement())
+  panelsAbbreviation String            @db.VarChar(255)
+  shortDescription   String            @db.VarChar(255)
+  price              Float
+  departmentId       Int
+  statusId           Int
+  createdDate        DateTime?         @default(now()) @db.Timestamptz(6)
+  createdBy          Int?
+  isActive           Boolean?
+  modifiedDate       DateTime?         @default(now()) @db.Timestamptz(6)
+  Accounts           Accounts?         @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "LabPanels_accounts_id_foreign")
+  LabDepartment      LabDepartment     @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "panels_department_id_foreign")
+  ItemStatus         ItemStatus        @relation(fields: [statusId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "panels_status_id_foreign")
+  LabPanelTest       LabPanelTest[]
+  LabTestResult      LabTestResult[]
+  OrderedLabPanel    OrderedLabPanel[]
+}
+
+model LabTestResult {
+  id                  Int                 @id @default(autoincrement())
+  infoId              Int
+  orderedPanelId      Int
+  testId              Int
+  result              String?             @db.VarChar(255)
+  createdDate         DateTime?           @default(now()) @db.Timestamptz(6)
+  createdBy           Int?
+  isActive            Boolean?
+  modifiedDate        DateTime?           @default(now()) @db.Timestamptz(6)
+  Accounts            Accounts?           @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "LabTestResult_accounts_id_foreign")
+  OrderedLabPanelInfo OrderedLabPanelInfo @relation(fields: [infoId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "LabTestResult_info_foreign")
+  LabPanels           LabPanels           @relation(fields: [orderedPanelId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "LabTestResult_ordered_id_foreign")
+  LabTests            LabTests            @relation(fields: [testId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "LabTestResult_test_id_foreign")
+}
+
+model LabTests {
+  id                   Int                @id @default(autoincrement())
+  testName             String             @db.VarChar(255)
+  abbreviation         String             @db.VarChar(255)
+  shortDescription     String             @db.VarChar(255)
+  unitOfMeasurementsId Int
+  createdDate          DateTime?          @default(now()) @db.Timestamptz(6)
+  createdBy            Int?
+  isActive             Boolean?
+  modifiedDate         DateTime?          @default(now()) @db.Timestamptz(6)
+  Accounts             Accounts?          @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "LabTests_accounts_id_foreign")
+  UnitOfMeasurements   UnitOfMeasurements @relation(fields: [unitOfMeasurementsId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "tests_unit_of_measurement_id_foreign")
+  LabPanelTest         LabPanelTest[]
+  LabTestResult        LabTestResult[]
+}
+
+model LabTransferStatus {
+  id              Int               @id(map: "LabTransfer_pkey") @default(autoincrement())
+  isTransfered    Boolean
+  Remark          String            @db.VarChar
+  TransferredBy   Int?
+  CreatedDate     DateTime?         @default(now()) @db.Timestamptz(6)
+  ModifiedDate    DateTime?         @default(now()) @db.Timestamptz(6)
+  IsActive        Boolean?
+  Accounts        Accounts?         @relation(fields: [TransferredBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "PaymentStatus_accounts_id_foreign")
+  OrderedLabPanel OrderedLabPanel[]
+}
+
+model Manufacturer {
+  Id                  Int       @id(map: "manufacturer_pk") @unique(map: "manufacturer_id_uindex") @default(autoincrement())
+  Name                String    @db.VarChar
+  Abbreviation        String    @db.VarChar
+  isin                String?   @db.VarChar
+  HeadQuarterLocation String?   @db.VarChar
+  Website             String?   @db.VarChar
+  CreatedBy           Int?
+  IsActive            Boolean?
+  CreatedDate         DateTime  @default(now())
+  ModifiedDate        DateTime?
+  Accounts            Accounts? @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "manufacturer_accounts_id_fk")
+  Product             Product?
+}
+
+model MaritalStatus {
+  id           Int           @id(map: "MaritalStatus_id_primary") @default(autoincrement())
+  Status       String        @db.VarChar(255)
+  Description  String        @db.VarChar(255)
+  CreatedDate  DateTime?     @default(now()) @db.Timestamptz(6)
+  CreatedBy    Int?
+  IsActive     Boolean?
+  ModifiedDate DateTime?     @default(now()) @db.Timestamptz(6)
+  Accounts     Accounts?     @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "MaritalStatus_accounts_id_foreign")
+  PatientList  PatientList[]
+}
+
+model Occupations {
+  id              Int           @id(map: "occupations_id_primary") @default(autoincrement())
+  Occupation_List String        @db.VarChar(255)
+  CreatedDate     DateTime?     @default(now()) @db.Timestamptz(6)
+  CreatedBy       Int?
+  IsActive        Boolean?
+  ModifiedDate    DateTime?     @default(now()) @db.Timestamptz(6)
+  Accounts        Accounts?     @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Occupations_accounts_id_foreign")
+  PatientList     PatientList[]
+}
+
+model OrderedImagRequest {
+  id                      Int                      @id @default(autoincrement())
+  InfoId                  Int?
+  RequestId               Int
+  TransferRadId           Int
+  PaymentStatusId         Int
+  CreatedDate             DateTime?                @default(now()) @db.Timestamptz(6)
+  CreatedBy               Int?
+  IsActive                Boolean?
+  ModifiedDate            DateTime?                @default(now()) @db.Timestamptz(6)
+  ResultId                Int?
+  Clinic                  Int?
+  Accounts                Accounts?                @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "OrderedImagRequest_accounts_id_foreign")
+  RadRequest              RadRequest               @relation(fields: [RequestId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orderedimagrequest_Request_id_foreign")
+  RadTransferStatus       RadTransferStatus        @relation(fields: [TransferRadId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orderedimagrequest_TransferRad_id_foreign")
+  ClinicList              ClinicList?              @relation(fields: [Clinic], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orderedimagrequest_cliniclist_id_fk")
+  OrderedImageRequestInfo OrderedImageRequestInfo? @relation(fields: [InfoId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orderedimagrequest_orderedimagerequestinfo_id_fk")
+  PaymentStatus           PaymentStatus            @relation(fields: [PaymentStatusId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orderedimagrequest_paymentstatusid_foreign")
+  RadRequestResult        RadRequestResult?        @relation(fields: [ResultId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orderedimagrequest_radrequestresult_id_fk")
+}
+
+model OrderedImageRequestInfo {
+  id                    Int                  @id(map: "orderedimagerequestinfo_pk") @unique(map: "orderedimagerequestinfo_id_uindex") @default(autoincrement())
+  AdditionalInformation String?              @db.VarChar
+  CreatedBy             Int?
+  CreatedDate           DateTime?            @default(now()) @db.Timestamptz(6)
+  PatientId             Int?
+  Accounts              Accounts?            @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orderedimagerequestinfo_accounts_id_fk")
+  PatientList           PatientList?         @relation(fields: [PatientId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orderedimagerequestinfo_patientlist_id_fk")
+  OrderedImagRequest    OrderedImagRequest[]
+}
+
+model OrderedLabPanel {
+  id                  Int                  @id @default(autoincrement())
+  InfoId              Int?
+  PanelId             Int
+  TransferLabId       Int
+  PaymentStatusId     Int
+  CreatedDate         DateTime?            @default(now()) @db.Timestamptz(6)
+  CreatedBy           Int?
+  IsActive            Boolean?
+  ModifiedDate        DateTime?            @default(now()) @db.Timestamptz(6)
+  Clinic              Int?
+  Accounts            Accounts?            @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "OrderedLabPanel_accounts_id_foreign")
+  ClinicList          ClinicList?          @relation(fields: [Clinic], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orderedlabpanel_cliniclist_id_fk")
+  LabTransferStatus   LabTransferStatus    @relation(fields: [TransferLabId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orderedpanel_TransferLab_foreign")
+  LabPanels           LabPanels            @relation(fields: [PanelId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orderedpanel_panel_id_foreign")
+  OrderedLabPanelInfo OrderedLabPanelInfo? @relation(fields: [InfoId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orderedpanel_patient_foreign")
+  PaymentStatus       PaymentStatus        @relation(fields: [PaymentStatusId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orderedpanel_paymentstatusid_foreign")
+}
+
+model OrderedLabPanelInfo {
+  id                    Int               @id(map: "orderedlabpanelinfo_pk") @unique(map: "orderedlabpanelinfo_id_uindex") @default(autoincrement())
+  PatientId             Int?
+  AdditionalInformation String?           @db.VarChar
+  CreatedBy             Int?
+  CreatedDate           DateTime?         @default(now()) @db.Timestamp(6)
+  Clinic                Int?
+  Accounts              Accounts?         @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orderedlabpanelinfo_accounts_id_fk")
+  ClinicList            ClinicList?       @relation(fields: [Clinic], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orderedlabpanelinfo_cliniclist_id_fk")
+  PatientList           PatientList?      @relation(fields: [PatientId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orderedlabpanelinfo_patientlist_id_fk")
+  LabTestResult         LabTestResult[]
+  OrderedLabPanel       OrderedLabPanel[]
+}
+
+model PatientEmergencyContact {
+  id             Int           @id(map: "PatientEmergencyContact_id_primary") @default(autoincrement())
+  FirstName      String        @db.VarChar(255)
+  MiddleName     String        @db.VarChar(255)
+  LastName       String        @db.VarChar(255)
+  GenderId       Int
+  RelationshipId Int
+  PhoneNumber    String        @db.VarChar
+  CreatedDate    DateTime?     @default(now()) @db.Timestamptz(6)
+  CreatedBy      Int?
+  ModifiedDate   DateTime?     @default(now()) @db.Timestamptz(6)
+  Relationship   Relationship  @relation(fields: [RelationshipId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "PatientEmergencyContact_Relationship_foreign")
+  Accounts       Accounts?     @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "PatientEmergencyContact_accounts_id_foreign")
+  Gender         Gender        @relation(fields: [GenderId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "PatientEmergencyContact_gender_foreign")
+  PatientList    PatientList[]
+}
+
+model PatientHistory {
+  id            Int             @id @default(autoincrement())
+  HistoryNote   String          @db.VarChar(255)
+  CreatedDate   DateTime?       @default(now()) @db.Timestamptz(6)
+  CreatedBy     Int?
+  IsActive      Boolean?
+  ModifiedDate  DateTime?       @default(now()) @db.Timestamptz(6)
+  Accounts      Accounts?       @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "PatientHistory_accounts_id_foreign")
+  Doc_Dashboard Doc_Dashboard[]
+}
+
+model PatientList {
+  id                        Int                       @id(map: "patient_id_primary") @default(autoincrement())
+  PreviousMRN               String                    @db.VarChar
+  FirstName                 String                    @db.VarChar(255)
+  MiddleName                String                    @db.VarChar(255)
+  LastName                  String                    @db.VarChar(255)
+  DateOfBirth               String                    @db.VarChar
+  PhoneNumber               String                    @db.VarChar
+  Email                     String                    @db.VarChar(255)
+  Postal                    String                    @db.VarChar(255)
+  GenderId                  Int
+  MaritalStatusId           Int
+  OccupationId              Int
+  CountryId                 Int
+  RegionId                  Int
+  SubCityId                 Int
+  WoredaId                  Int
+  ZoneId                    Int?
+  Kebele                    String                    @db.VarChar(255)
+  HouseNumber               String                    @db.VarChar(255)
+  PatientEmergencyContactId Int?
+  PatientStatusId           Int
+  RegistrationDate          DateTime?                 @default(now()) @db.Timestamptz(6)
+  CreatedDate               DateTime?                 @default(now()) @db.Timestamptz(6)
+  CreatedBy                 Int?
+  IsActive                  Boolean?
+  ModifiedDate              DateTime?                 @default(now()) @db.Timestamptz(6)
+  SoundX                    String?                   @db.VarChar
+  Accounts                  Accounts?                 @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Patient_accounts_id_foreign")
+  PatientEmergencyContact   PatientEmergencyContact?  @relation(fields: [PatientEmergencyContactId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_PatientEmergencyContact_foreign")
+  PatientStatus             PatientStatus             @relation(fields: [PatientStatusId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_PatientStatus_foreign")
+  Country                   Country                   @relation(fields: [CountryId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_country_foreign")
+  Gender                    Gender                    @relation(fields: [GenderId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_gender_foreign")
+  MaritalStatus             MaritalStatus             @relation(fields: [MaritalStatusId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_maritalStatus_foreign")
+  Occupations               Occupations               @relation(fields: [OccupationId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_occupation_foreign")
+  Region                    Region                    @relation(fields: [RegionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_region_foreign")
+  SubCity                   SubCity                   @relation(fields: [SubCityId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_subcity_foreign")
+  Woreda                    Woreda                    @relation(fields: [WoredaId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_woreda_foreign")
+  Zone                      Zone?                     @relation(fields: [ZoneId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patient_zone_foreign")
+  Doc_Dashboard             Doc_Dashboard[]
+  Invoice                   Invoice[]
+  OrderedImageRequestInfo   OrderedImageRequestInfo[]
+  OrderedLabPanelInfo       OrderedLabPanelInfo[]
+  PatientPrescription       PatientPrescription[]
+  RadRequestResult          RadRequestResult[]
+}
+
+model PatientManagement {
+  id            Int             @id @default(autoincrement())
+  Management    String          @db.VarChar(255)
+  CreatedDate   DateTime?       @default(now()) @db.Timestamptz(6)
+  CreatedBy     Int?
+  IsActive      Boolean?
+  ModifiedDate  DateTime?       @default(now()) @db.Timestamptz(6)
+  Accounts      Accounts?       @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "PatientManagement_accounts_id_foreign")
+  Doc_Dashboard Doc_Dashboard[]
+}
+
+model PatientPrescription {
+  id              Int           @id @default(autoincrement())
+  Medication      String?       @db.VarChar(255)
+  Strength        String?       @db.VarChar
+  AmountToBeTaken String?       @db.VarChar
+  Frequency       String?       @db.VarChar(255)
+  Route           String        @db.VarChar(255)
+  HowMuch         String?       @db.VarChar(255)
+  Refills         String        @db.VarChar(255)
+  Note            String?       @db.VarChar(255)
+  CreatedDate     DateTime?     @default(now()) @db.Timestamptz(6)
+  CreatedBy       Int?
+  IsActive        Boolean?
+  ModifiedDate    DateTime?     @default(now()) @db.Timestamptz(6)
+  PatientId       Int?
+  Clinic          Int?
+  Accounts        Accounts?     @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "PatientPrescription_accounts_id_foreign")
+  ClinicList      ClinicList?   @relation(fields: [Clinic], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patientprescription_cliniclist_id_fk")
+  PatientList     PatientList?  @relation(fields: [PatientId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "patientprescription_patientlist_id_fk")
+  InvoiceItem     InvoiceItem[]
+}
+
+model PatientProgress {
+  id            Int             @id @default(autoincrement())
+  Progress      String          @db.VarChar(255)
+  CreatedDate   DateTime?       @default(now()) @db.Timestamptz(6)
+  CreatedBy     Int?
+  IsActive      Boolean?
+  ModifiedDate  DateTime?       @default(now()) @db.Timestamptz(6)
+  Accounts      Accounts?       @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "PatientProgress_accounts_id_foreign")
+  Doc_Dashboard Doc_Dashboard[]
+}
+
+model PatientStatus {
+  id           Int           @id(map: "PatientStatus_id_primary") @default(autoincrement())
+  Status       String        @db.VarChar(255)
+  CreatedDate  DateTime?     @default(now()) @db.Timestamptz(6)
+  CreatedBy    Int?
+  IsActive     Boolean?
+  ModifiedDate DateTime?     @default(now()) @db.Timestamptz(6)
+  Accounts     Accounts?     @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "PatientStatus_accounts_id_foreign")
+  PatientList  PatientList[]
+}
+
+model PaymentStatus {
+  id                 Int                  @id @default(autoincrement())
+  isPayed            Boolean
+  Remark             String               @db.VarChar(255)
+  CreatedDate        DateTime?            @default(now()) @db.Timestamptz(6)
+  ApprovedBy         Int?
+  IsActive           Boolean?
+  ModifiedDate       DateTime?            @default(now()) @db.Timestamptz(6)
+  Type               Int?
+  paidAmount         Float?
+  Accounts           Accounts?            @relation(fields: [ApprovedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "PaymentStatus_accounts_id_foreign")
+  PaymentType        PaymentType?         @relation(fields: [Type], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "paymentstatus_paymenttype_id_fk")
+  OrderedImagRequest OrderedImagRequest[]
+  OrderedLabPanel    OrderedLabPanel[]
+}
+
+model PaymentType {
+  id            Int             @id(map: "paymenttype_pk") @unique(map: "paymenttype_id_uindex") @default(autoincrement())
+  Name          String?         @db.VarChar
+  PaymentStatus PaymentStatus[]
+}
+
+model PhoneNumberType {
+  id                 Int                  @id(map: "phone_number_type_id_primary") @default(autoincrement())
+  PhoneType          String               @db.VarChar(255)
+  Description        String               @db.VarChar(255)
+  CreatedDate        DateTime?            @default(now()) @db.Timestamptz(6)
+  CreatedBy          Int?
+  IsActive           Boolean?
+  ModifiedDate       DateTime?            @default(now()) @db.Timestamptz(6)
+  AccountInformation AccountInformation[]
+}
+
+model PhysicalExamination {
+  id                Int             @id @default(autoincrement())
+  GeneralAppearance String          @db.VarChar(255)
+  HEENT             String          @db.VarChar(255)
+  RespiratorySystem String          @db.VarChar(255)
+  CVS               String          @db.VarChar(255)
+  Abdomen           String          @db.VarChar(255)
+  GUS               String          @db.VarChar(255)
+  MSS               String          @db.VarChar(255)
+  Integumentary     String          @db.VarChar(255)
+  CNS               String          @db.VarChar(255)
+  Obstetrics        String          @db.VarChar(255)
+  Gynecological     String          @db.VarChar(255)
+  Neonatal          String          @db.VarChar(255)
+  LGS               String          @db.VarChar(255)
+  Weight            String          @db.VarChar
+  Height            String          @db.VarChar
+  CreatedDate       DateTime?       @default(now()) @db.Timestamptz(6)
+  CreatedBy         Int?
+  IsActive          Boolean?
+  ModifiedDate      DateTime?       @default(now()) @db.Timestamptz(6)
+  Accounts          Accounts?       @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "PhysicalExamination_accounts_id_foreign")
+  Doc_Dashboard     Doc_Dashboard[]
+}
+
+model Product {
+  id                                 Int                @id @default(autoincrement())
+  Name                               String             @db.VarChar(255)
+  Code                               String             @db.VarChar(255)
+  Amount                             Int
+  UnitOfMeasurementid                Int
+  DosageForm                         String             @db.VarChar(255)
+  Manufacturer                       Int
+  CreatedDate                        DateTime?          @default(now()) @db.Timestamptz(6)
+  CreatedBy                          Int?
+  IsActive                           Boolean?
+  ModifiedDate                       DateTime?          @default(now()) @db.Timestamptz(6)
+  Accounts                           Accounts?          @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Product_accounts_id_foreign")
+  Manufacturer_ManufacturerToProduct Manufacturer       @relation(fields: [id], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "product_manufacturer_id_fk")
+  UnitOfMeasurements                 UnitOfMeasurements @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "product_unitofmeasurement_id_fk")
+  Stock                              Stock[]
+}
+
+model RadDepartment {
+  id           Int          @id @default(autoincrement())
+  Name         String       @db.VarChar(255)
+  Abbreviation String       @db.VarChar(255)
+  Remark       String       @db.VarChar
+  CreatedDate  DateTime?    @default(now()) @db.Timestamptz(6)
+  CreatedBy    Int?
+  IsActive     Boolean?
+  ModifiedDate DateTime?    @default(now()) @db.Timestamptz(6)
+  Accounts     Accounts?    @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "RadDepartment_accounts_id_foreign")
+  RadRequest   RadRequest[]
+}
+
+model RadRequest {
+  id                 Int                  @id @default(autoincrement())
+  RequestName        String               @db.VarChar(255)
+  Abbreviation       String               @db.VarChar(255)
+  ShortDescription   String               @db.VarChar(255)
+  Price              Float
+  RadDepartmentId    Int
+  CreatedDate        DateTime?            @default(now()) @db.Timestamptz(6)
+  CreatedBy          Int?
+  IsActive           Boolean?
+  ModifiedDate       DateTime?            @default(now()) @db.Timestamptz(6)
+  Accounts           Accounts?            @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "RadRequest_accounts_id_foreign")
+  RadDepartment      RadDepartment        @relation(fields: [RadDepartmentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "RadRequest_department_id_foreign")
+  OrderedImagRequest OrderedImagRequest[]
+}
+
+model RadRequestResult {
+  id                 Int                  @id @default(autoincrement())
+  PatientId          Int
+  Result             String?              @db.VarChar
+  CreatedDate        DateTime?            @default(now()) @db.Timestamptz(6)
+  CreatedBy          Int?
+  IsActive           Boolean?
+  ModifiedDate       DateTime?            @default(now()) @db.Timestamptz(6)
+  Clinic             Int?
+  PatientList        PatientList          @relation(fields: [PatientId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "RadRequestResult_Patient_id_foreign")
+  Accounts           Accounts?            @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "RadRequestResult_accounts_id_foreign")
+  ClinicList         ClinicList?          @relation(fields: [Clinic], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "radrequestresult_cliniclist_id_fk")
+  OrderedImagRequest OrderedImagRequest[]
+}
+
+model RadTransferStatus {
+  id                 Int                  @id(map: "RadTransfer_pkey") @default(autoincrement())
+  isTransfered       Boolean
+  Remark             String               @db.VarChar
+  TransferredBy      Int?
+  CreatedDate        DateTime?            @default(now()) @db.Timestamptz(6)
+  IsActive           Boolean?
+  ModifiedDate       DateTime?            @default(now()) @db.Timestamptz(6)
+  OrderedImagRequest OrderedImagRequest[]
+}
+
+model Region {
+  id           Int           @id(map: "region_id_primary") @default(autoincrement())
+  RegionName   String        @db.VarChar(255)
+  CountryId    Int
+  CreatedDate  DateTime?     @default(now()) @db.Timestamptz(6)
+  CreatedBy    Int?
+  IsActive     Boolean?
+  ModifiedDate DateTime?     @default(now()) @db.Timestamptz(6)
+  Accounts     Accounts?     @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Region_accounts_id_foreign")
+  Country      Country       @relation(fields: [CountryId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "region_country_id_foreign")
+  PatientList  PatientList[]
+  SubCity      SubCity[]
+  Zone         Zone[]
+}
+
+model Relationship {
+  id                      Int                       @id(map: "Relationship_id_primary") @default(autoincrement())
+  RelationshipType        String                    @db.VarChar(100)
+  Description             String                    @db.VarChar
+  CreatedDate             DateTime?                 @default(now()) @db.Timestamptz(6)
+  CreatedBy               Int?
+  IsActive                Boolean?
+  ModifiedDate            DateTime?                 @default(now()) @db.Timestamptz(6)
+  PatientEmergencyContact PatientEmergencyContact[]
+}
+
+model SickLeave {
+  id             Int         @id @default(autoincrement())
+  PatientId      Int
+  DiagnosisId    Int?
+  Recommendation String      @db.VarChar(255)
+  TotalLeaveDays Int
+  CreatedDate    DateTime?   @default(now()) @db.Timestamptz(6)
+  CreatedBy      Int?
+  IsActive       Boolean?
+  ModifiedDate   DateTime?   @default(now()) @db.Timestamptz(6)
+  Clinic         Int?
+  Diagnosis      String?     @db.VarChar
+  Accounts       Accounts?   @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "SickLeave_accounts_id_foreign")
+  ClinicList     ClinicList? @relation(fields: [Clinic], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sickleave_cliniclist_id_fk")
+}
+
+model Stock {
+  id                 Int           @id @default(autoincrement())
+  ProductId          Int
+  ReferralID         String        @db.VarChar(255)
+  BatchId            String        @db.VarChar(255)
+  TotalUnitPurchased Float
+  UnitPurchasedPrice Float
+  UnitRetailPrice    Float
+  ManufactureDate    DateTime      @db.Date
+  IsExpireId         Int
+  RemainsUnit        Int
+  CreatedDate        DateTime?     @default(now()) @db.Timestamptz(6)
+  CreatedBy          Int?
+  IsActive           Boolean?
+  ModifiedDate       DateTime?     @default(now()) @db.Timestamptz(6)
+  Accounts           Accounts?     @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Stock_accounts_id_foreign")
+  IsExpire           IsExpire      @relation(fields: [IsExpireId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "stock_is_expire_foreign")
+  Product            Product       @relation(fields: [ProductId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "stock_productid_foreign")
+  InvoiceItem        InvoiceItem[]
+}
+
+model SubCity {
+  id           Int           @id(map: "subCity_id_primary") @default(autoincrement())
+  FullName     String        @db.VarChar(255)
+  RegionId     Int
+  CreatedDate  DateTime?     @default(now()) @db.Timestamptz(6)
+  CreatedBy    Int?
+  IsActive     Boolean?
+  ModifiedDate DateTime?     @default(now()) @db.Timestamptz(6)
+  Accounts     Accounts?     @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "SubCity_accounts_id_foreign")
+  Region       Region        @relation(fields: [RegionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "subcity_region_id_foreign")
+  PatientList  PatientList[]
+  Woreda       Woreda[]
+}
+
+model Title {
+  id                 Int                  @id(map: "title_id_primary") @default(autoincrement())
+  Title              String               @db.VarChar(255)
+  Abbreviation       String               @db.VarChar(255)
+  Description        String               @db.VarChar(255)
+  CreatedDate        DateTime?            @default(now()) @db.Timestamptz(6)
+  CreatedBy          Int?
+  IsActive           Boolean?
+  ModifiedDate       DateTime?            @default(now()) @db.Timestamptz(6)
+  Accounts           Accounts?            @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Title_accounts_id_foreign")
+  AccountInformation AccountInformation[]
+}
+
+model UnitOfMeasurements {
+  id           Int        @id @default(autoincrement())
+  name         String     @db.VarChar(255)
+  symbols      String     @db.VarChar(255)
+  createdDate  DateTime?  @default(now()) @db.Timestamptz(6)
+  createdBy    Int?
+  isActive     Boolean?
+  modifiedDate DateTime?  @default(now()) @db.Timestamptz(6)
+  description  String?    @db.VarChar
+  Accounts     Accounts?  @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "UnitOfMeasurements_accounts_id_foreign")
+  LabTests     LabTests[]
+  Product      Product?
+}
+
+model VitalSigns {
+  id                                      Int             @id @default(autoincrement())
+  Blood_Pressure_BP_                      String          @map("Blood Pressure(BP)") @db.VarChar
+  Pulse_Rate_PR_                          String          @map("Pulse Rate(PR)") @db.VarChar
+  Respiration_Rate_RR_                    String          @map("Respiration Rate(RR)") @db.VarChar
+  Saturation_of_Oxygen_in_the_Blood_SPO2_ String          @map("Saturation of Oxygen in the Blood(SPO2)") @db.VarChar
+  Body_Temperature_BT_                    String          @map("Body Temperature(BT)") @db.VarChar
+  CreatedDate                             DateTime?       @default(now()) @db.Timestamptz(6)
+  CreatedBy                               Int?
+  IsActive                                Boolean?
+  ModifiedDate                            DateTime?       @default(now()) @db.Timestamptz(6)
+  Accounts                                Accounts?       @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "VitalSigns_accounts_id_foreign")
+  Doc_Dashboard                           Doc_Dashboard[]
+}
+
+model Woreda {
+  id           Int           @id(map: "woreda_id_primary") @default(autoincrement())
+  WoredaName   String?       @db.VarChar(255)
+  SubCityId    Int?
+  CreatedDate  DateTime?     @default(now()) @db.Timestamptz(6)
+  CreatedBy    Int?
+  ModifiedDate DateTime?     @default(now()) @db.Timestamptz(6)
+  Accounts     Accounts?     @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Woreda_accounts_id_foreign")
+  SubCity      SubCity?      @relation(fields: [SubCityId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "woreda_subCity_id_foreign")
+  PatientList  PatientList[]
+}
+
+model Zone {
+  id           Int           @id(map: "zone_id_primary") @default(autoincrement())
+  ZoneName     String        @db.VarChar(255)
+  RegionId     Int
+  CreatedDate  DateTime?     @default(now()) @db.Timestamptz(6)
+  CreatedBy    Int?
+  IsActive     Boolean?
+  ModifiedDate DateTime?     @default(now()) @db.Timestamptz(6)
+  Accounts     Accounts?     @relation(fields: [CreatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Zone_accounts_id_foreign")
+  Region       Region        @relation(fields: [RegionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "zone_region_id_foreign")
+  PatientList  PatientList[]
+}
