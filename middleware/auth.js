@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 const admin = async (req, res, next) => {
-  // check header
+  
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer")) {
     throw new Error("Authentication invalid");
@@ -10,7 +10,7 @@ const admin = async (req, res, next) => {
 
 };
 const reception = async (req, res, next) => {
-  // check header
+  
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer")) {
     throw new Error("Authentication invalid");
@@ -18,7 +18,7 @@ const reception = async (req, res, next) => {
 };
 
 const other = async (req, res, next) => {
-  // check header
+  
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer")) {
     throw new Error("Authentication invalid");
